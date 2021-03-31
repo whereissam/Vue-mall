@@ -5,7 +5,12 @@
     <!-- <Home-swiper :banners='banners'/> -->
     <recommend-view :recommends='recommends' />
     <feature-view/>
-    <tab-control class="tabControl" :titles="['流行','新款','精選']"/>
+    <tab-control class="tabControl" 
+                :titles="['流行','新款','精選']"
+                @tabClick='tabClick'
+                />
+    <good-list :goods="goods[this.currentType].list" />
+    <!-- {{this.currentType}} , {{this.goods[this.currentType].list}} -->
     <ul>
       <li>This is a li</li>
       <li>This is a li</li>
@@ -51,6 +56,7 @@ import FeatureView from "./childComponents/FeatureView"
 
 import NavBar from "../../components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
+import GoodList from "components/content/goods/GoodList"
 
 //方法
 import {
@@ -66,7 +72,8 @@ export default {
     RecommendView,
     FeatureView,
     NavBar,
-    TabControl
+    TabControl,
+    GoodList
   },
   data(){
    return{
@@ -74,9 +81,10 @@ export default {
       recommends:[],
       goods:{
         'pop' : {page:0, list:[]}, //page 當前頁數 、 list 當前全部內容
-        'news' : {page:0, list:[]},
+        'new' : {page:0, list:[]},
         'sell' : {page:0, list:[]}
-      }
+      },
+      currentType : 'pop'
     }
   },
   created(){ //只寫請求 邏輯另外寫
@@ -89,6 +97,12 @@ export default {
     this.getHomeGoods('sell')
     // console.log(this.banners)
   },
+  // computed:{
+  //   showGoods(){
+  //     return this.goods[this.currentType].list
+  //     // console.log(this.goods)
+  //   }
+  // },
   methods:{
     getHomeMultidata(){
      getHomeMultidata().then(res =>{
@@ -102,6 +116,20 @@ export default {
       getHomeGoods(type, 1).then(res => {
       console.log(res)
     })
+    },
+    tabClick(index){
+      // console.log(index)
+      switch(index){
+        case 0:
+          this.currentType = 'pop'
+          break
+        case 1:
+          this.currentType = 'new'
+          break
+        case 2:
+          this.currentType = 'sell'
+          break
+      }
     }
   }
 };
@@ -113,6 +141,10 @@ export default {
 }
 #home img{
   width: 100%;
+}
+#home ul li{
+  width: 100%;
+  height: 100px;
 }
 .home-nav {
   background-color: var(--color-tint);
@@ -127,7 +159,9 @@ export default {
 
 .tabControl{
   position: sticky;
-  top:44px
+  top:44px;
+  z-index: 9;
+  background-color: #fff;
 }
 </style>
 
