@@ -1,16 +1,18 @@
 <template>
-  <div id="home">
+  <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">購物街</div></nav-bar>
-    <img src="https://s10.mogucdn.com/mlcdn/c45406/180926_45fkj8ifdj4l824l42dgf9hd0h495_750x390.jpg" alt="">
-    <!-- <Home-swiper :banners='banners'/> -->
-    <recommend-view :recommends='recommends' />
-    <feature-view/>
-    <tab-control class="tabControl" 
-                :titles="['流行','新款','精選']"
-                @tabClick='tabClick'
-                />
-    <good-list :goods="goods[this.currentType].list" />
-    <!-- {{this.currentType}} , {{this.goods[this.currentType].list}} -->
+    
+    <scroll class="content">
+      <img src="https://s10.mogucdn.com/mlcdn/c45406/180926_45fkj8ifdj4l824l42dgf9hd0h495_750x390.jpg" alt="">
+      <!-- <Home-swiper :banners='banners'/> -->
+      <recommend-view :recommends='recommends' />
+      <feature-view/>
+      <tab-control class="tabControl" 
+                  :titles="['流行','新款','精選']"
+                  @tabClick='tabClick'
+                  />
+      <good-list :goods="goods[this.currentType].list" />
+    </scroll>
     <ul>
       <li>This is a li</li>
       <li>This is a li</li>
@@ -65,6 +67,8 @@ import {
   } from "network/home"
 // import TabControl from '../../components/content/tabControl/TabControl.vue';
 
+import Scroll from "components/common/scroll/Scroll"
+
 export default {
   name: "Home",
   components: {
@@ -73,7 +77,8 @@ export default {
     FeatureView,
     NavBar,
     TabControl,
-    GoodList
+    GoodList,
+    Scroll
   },
   data(){
    return{
@@ -135,9 +140,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #home{
   padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 #home img{
   width: 100%;
@@ -163,5 +170,22 @@ export default {
   z-index: 9;
   background-color: #fff;
 }
+.content{
+  overflow: hidden;
+
+  position: absolute;
+  top: 44px;
+  bottom: 43px;
+  left: 0;
+  right: 0;
+  /* height:calc(100%-93px);
+  overflow: hidden; */
+
+}
+/* .content{
+  height: calc(100%-93px);
+  overflow: hidden;
+  margin-top: 44px;
+} */
 </style>
 
