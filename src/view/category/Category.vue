@@ -1,5 +1,5 @@
 <template>
-  <div class="category">Category
+  <div class="wrapper" ref='wrapper'>Category
     <ul>
       <li>this is li1</li>
       <li>this is li2</li>
@@ -116,9 +116,9 @@ export default {
     }
   },
   mounted(){
-    this.scroll = new BScroll('.category',{
+    this.scroll = new BScroll(this.$refs.wrapper,{
       probeType: 3,
-      pullUpLoad: true
+      pullUpLoad: true 
     })
 
     this.scroll.on('scroll', (position) => {
@@ -132,8 +132,8 @@ export default {
 };
 </script>
 
-<style>
-.category{
+<style scoped>
+.wrapper{
     height: 500px;
     background-color: red;
     overflow: hidden;

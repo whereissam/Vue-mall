@@ -2,7 +2,14 @@
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">購物街</div></nav-bar>
     
-    <scroll class="content">
+    <scroll class="content" 
+            ref="scroll" 
+            :probe-type='3' 
+            @scroll="contentScroll"
+            :pull-up-load = 'true'
+            @pullingUp = 'loadMore'
+            > 
+      <!-- 用 ref="scroll" 來取得scroll這個組件的東西 -->
       <img src="https://s10.mogucdn.com/mlcdn/c45406/180926_45fkj8ifdj4l824l42dgf9hd0h495_750x390.jpg" alt="">
       <!-- <Home-swiper :banners='banners'/> -->
       <recommend-view :recommends='recommends' />
@@ -10,41 +17,45 @@
       <tab-control class="tabControl" 
                   :titles="['流行','新款','精選']"
                   @tabClick='tabClick'
+
                   />
       <good-list :goods="goods[this.currentType].list" />
+       <ul>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+      <li>This is a li</li>
+       </ul>
+       
     </scroll>
-    <ul>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-      <li>This is a li</li>
-    </ul>
+    <back-top @click.native='goTop' v-show="isShowBack"/>
+   
   </div>
 </template>
 
@@ -59,6 +70,8 @@ import FeatureView from "./childComponents/FeatureView"
 import NavBar from "../../components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodList from "components/content/goods/GoodList"
+import BackTop from "components/common/backTop/BackTop"
+import Scroll from "components/common/scroll/Scroll"
 
 //方法
 import {
@@ -67,7 +80,7 @@ import {
   } from "network/home"
 // import TabControl from '../../components/content/tabControl/TabControl.vue';
 
-import Scroll from "components/common/scroll/Scroll"
+
 
 export default {
   name: "Home",
@@ -78,7 +91,8 @@ export default {
     NavBar,
     TabControl,
     GoodList,
-    Scroll
+    Scroll,
+    BackTop
   },
   data(){
    return{
@@ -89,7 +103,8 @@ export default {
         'new' : {page:0, list:[]},
         'sell' : {page:0, list:[]}
       },
-      currentType : 'pop'
+      currentType : 'pop',
+      isShowBack: true
     }
   },
   created(){ //只寫請求 邏輯另外寫
@@ -123,7 +138,7 @@ export default {
     })
     },
     tabClick(index){
-      // console.log(index)
+      console.log(index)
       switch(index){
         case 0:
           this.currentType = 'pop'
@@ -135,7 +150,18 @@ export default {
           this.currentType = 'sell'
           break
       }
-    }
+    },
+   goTop(){
+    //  console.log("To top")
+    this.$refs.scroll.scrollTo(0,0,500) //取得Scroll.vue裡的方法
+   },
+   contentScroll(position){
+    //  console.log(position);
+     this.isShowBack =  (-position.y) > 1000
+   },
+   loadMore(){
+     console.log("load more");
+   }
   }
 };
 </script>
@@ -145,6 +171,8 @@ export default {
   padding-top: 44px;
   height: 100vh;
   position: relative;
+  /* background-color: red; */
+  /* opacity: 0.5; */
 }
 #home img{
   width: 100%;
@@ -175,12 +203,10 @@ export default {
 
   position: absolute;
   top: 44px;
-  bottom: 43px;
+  bottom: 60px;
   left: 0;
   right: 0;
-  /* height:calc(100%-93px);
-  overflow: hidden; */
-
+  /* background-color: red; */
 }
 /* .content{
   height: calc(100%-93px);
