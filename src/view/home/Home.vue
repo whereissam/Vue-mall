@@ -1,23 +1,29 @@
 <template>
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">購物街</div></nav-bar>
-    
+    <tab-control class="tabControl" 
+                  :titles="['流行','新款','精選']"
+                  @tabClick='tabClick'
+                  ref="tabbar1"
+                  v-show="isTabFixed"
+                  />
+      <!-- 直接包兩層tab-control，當條件達到時展現，許多動畫都用一樣的道理! -->
     <scroll class="content" 
             ref="scroll" 
             :probe-type='3' 
             @scroll="contentScroll"
             :pull-up-load = 'true'
-            @pullingUp = 'loadMore'
             > 
       <!-- 用 ref="scroll" 來取得scroll這個組件的東西 -->
-      <img src="https://s10.mogucdn.com/mlcdn/c45406/180926_45fkj8ifdj4l824l42dgf9hd0h495_750x390.jpg" alt="">
-      <!-- <Home-swiper :banners='banners'/> -->
+      <home-swiper :banners="banners"
+                     ref="hSwiper"
+                     @swiperImgLoad='swiperImgLoad'>
+      </home-swiper>
       <recommend-view :recommends='recommends' />
       <feature-view/>
-      <tab-control class="tabControl" 
-                  :titles="['流行','新款','精選']"
+      <tab-control :titles="['流行','新款','精選']"
                   @tabClick='tabClick'
-
+                  ref="tabbar2"
                   />
       <good-list :goods="goods[this.currentType].list" />
        <ul>
@@ -63,7 +69,7 @@
 //分類import的組件
 
 //
-// import HomeSwiper from "./childComponents/HomeSwiper"
+import HomeSwiper from './childComponents/HomeSwiper'
 import RecommendView from "./childComponents/RecommendView"
 import FeatureView from "./childComponents/FeatureView"
 
@@ -78,14 +84,11 @@ import {
   getHomeMultidata,
   getHomeGoods
   } from "network/home"
-// import TabControl from '../../components/content/tabControl/TabControl.vue';
-
-
 
 export default {
   name: "Home",
   components: {
-    // HomeSwiper,
+    HomeSwiper,
     RecommendView,
     FeatureView,
     NavBar,
@@ -104,7 +107,10 @@ export default {
         'sell' : {page:0, list:[]}
       },
       currentType : 'pop',
-      isShowBack: true
+      isShowBack: true,
+      tabOffsetTop : 0,
+      isTabFixed: false,
+      scrollY : 0
     }
   },
   created(){ //只寫請求 邏輯另外寫
@@ -115,7 +121,30 @@ export default {
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
-    // console.log(this.banners)
+    //在create 的時候取用methods方法
+
+  },
+  mounted(){ //原先放到create，但是剛創建的vue裡面調用方法會釣不到，裡面還尚未將el掛載上去
+ //3.監聽item中圖片加載完成
+ const refresh = this.debounce(this.$refs.scroll.refresh,200)
+  this.$bus.$on('itemImageLoad', () => {
+    //默認bus是空的
+    // console.log('.....');
+    refresh() 
+    //this.debounce(xxx) = debounce裡的return function ->
+    // const refresh = function(...args){}，所以可以直接調用refresh()
+  })
+  },
+  // destroyed(){//路又切換會銷毀，切回來會重新創建，除非使用keepalive
+  //   console.log("home destory")
+  // },
+  activated(){
+    this.$refs.scroll.scrollTo(0,this.scrollY,0)
+    this.$refs.scroll.refresh() //強制刷新避免出問題
+  },
+  deactivated(){
+    console.log(this.scrollY)
+    this.scrollY = this.$refs.scroll.getScrollY()
   },
   // computed:{
   //   showGoods(){
@@ -124,6 +153,14 @@ export default {
   //   }
   // },
   methods:{
+    debounce(func, delay){
+      let timer = null
+      return function(...args){
+        if (timer) clearTimeout(()=>{
+          func.apply(args)
+        }, delay)
+      }
+    },
     getHomeMultidata(){
      getHomeMultidata().then(res =>{
       // console.log(res);
@@ -133,8 +170,15 @@ export default {
       })
     },
     getHomeGoods(type){
-      getHomeGoods(type, 1).then(res => {
+      //根據請求調用data
+      const page = this.goods[type].page + 1
+      getHomeGoods(type, page).then(res => {
       console.log(res)
+      this.goods[type].list.push(...res.data.list)
+      this.goods[type].page += 1
+
+      //完成上拉加載更多
+      this.$refs.scroll.finishPullUp() //當pullup finish去跑finsihpullup這個function
     })
     },
     tabClick(index){
@@ -150,6 +194,9 @@ export default {
           this.currentType = 'sell'
           break
       }
+      this.$refs.tabbar1.currentIndex = index
+      this.$refs.tabbar2.currentIndex = index
+      //保持兩個tabbar的index和現在currentIndex一樣
     },
    goTop(){
     //  console.log("To top")
@@ -157,10 +204,17 @@ export default {
    },
    contentScroll(position){
     //  console.log(position);
+    //1.判斷backTop是否顯示
      this.isShowBack =  (-position.y) > 1000
+   
+   //2. 判斷tabbar是否固定
+  this.isTabFixed = (-position.y) > this.tabOffsetTop
    },
-   loadMore(){
-     console.log("load more");
+   swiperImgLoad(){
+    // console.log('...');
+    this.tabOffsetTop = this.$refs.tabbar2.$el.offsetTop
+    // console.log(this.tabOffsetTop)
+
    }
   }
 };
@@ -213,5 +267,6 @@ export default {
   overflow: hidden;
   margin-top: 44px;
 } */
+
 </style>
 

@@ -1,39 +1,8 @@
 <template>
   <div class="goods">
+       <button @click="detail">GO to deatil</button>
       <goods-list-item v-for='item in goods' :key="item"/>
       {{goods}}
-      <!-- <ul>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-          <li>Hahaha</li>
-      </ul> -->
   </div>
 </template>
 
@@ -50,6 +19,11 @@ export default {
             default(){
                 return []
             }
+        }
+    },
+    methods:{
+        detail(){
+            this.$router.push('/detail')
         }
     }
 }
